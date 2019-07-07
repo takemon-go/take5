@@ -7,6 +7,25 @@ import (
 	"strings"
 )
 
+func ReadRunes(f func(rune)) {
+	reader, err := NewTextReader()
+	if err != nil {
+		panic(err)
+	}
+	defer reader.Close()
+
+	for {
+		char, isEof, err := reader.ReadRune()
+		if err != nil {
+			panic(err)
+		}
+		if isEof {
+			break
+		}
+		f(char)
+	}
+}
+
 func ReadLines(f func(string)) {
 	reader, err := NewTextReader()
 	if err != nil {
