@@ -49,12 +49,22 @@ func NewTextReader() (*TextReader, error) {
 
 	self := new(TextReader)
 	self.file = file
-	self.reader = bufio.NewReaderSize(file, 4096)
+	self.reader = bufio.NewReader(file)
 	return self, nil
 }
 
 func (self *TextReader) Close() {
 	self.file.Close()
+}
+
+func (self *TextReader) ReadRune() (char rune, isEof bool, err error) {
+	isEof = false
+	char, _, err = self.reader.ReadRune()
+	if err == io.EOF {
+		isEof = true
+		err = nil
+	}
+	return
 }
 
 func (self *TextReader) ReadLine() (line string, isEof bool, err error) {
