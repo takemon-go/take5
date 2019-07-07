@@ -7,6 +7,26 @@ import (
 	"strings"
 )
 
+func ReadWords(f func(string)) {
+	buf := make([]rune, 0)
+	ReadRunes(func(char rune) {
+		isSep := char < '0' ||
+			('9' < char && char < 'A') ||
+			('Z' < char && char < '_') ||
+			('_' < char && char < 'a') ||
+			('z' < char && char <= '~')
+		if isSep {
+			if 0 < len(buf) {
+				f(string(buf))
+			}
+			f(string(char))
+			buf = make([]rune, 0)
+			return
+		}
+		buf = append(buf, char)
+	})
+}
+
 func ReadRunes(f func(rune)) {
 	reader, err := NewTextReader()
 	if err != nil {
