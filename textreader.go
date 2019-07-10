@@ -9,22 +9,35 @@ import (
 
 func ReadWords(f func(string)) {
 	buf := make([]rune, 0)
-	ReadRunes(func(char rune) {
-		isSep := char < '0' ||
-			('9' < char && char < 'A') ||
-			('Z' < char && char < '_') ||
-			('_' < char && char < 'a') ||
-			('z' < char && char <= '~')
-		if isSep {
-			if 0 < len(buf) {
-				f(string(buf))
-			}
-			f(string(char))
-			buf = make([]rune, 0)
-			return
+	grp := 'S'
+
+	ReadRunes(func(c rune) {
+		g := 'S'
+		if ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') {
+			g = 'A'
+		} else if '0' <= c && c <= '9' {
+			g = 'N'
+		} else if '~' < c {
+			g = 'O'
 		}
-		buf = append(buf, char)
+
+		if g != grp && 0 < len(buf) {
+			f(string(buf))
+			buf = make([]rune, 0)
+		}
+
+		grp = g
+
+		if g == 'S' {
+			f(string(c))
+		} else {
+			buf = append(buf, c)
+		}
 	})
+
+	if 0 < len(buf) {
+		f(string(buf))
+	}
 }
 
 func ReadRunes(f func(rune)) {
@@ -35,14 +48,14 @@ func ReadRunes(f func(rune)) {
 	defer reader.Close()
 
 	for {
-		char, isEof, err := reader.ReadRune()
+		c, isEof, err := reader.ReadRune()
 		if err != nil {
 			panic(err)
 		}
 		if isEof {
 			break
 		}
-		f(char)
+		f(c)
 	}
 }
 
